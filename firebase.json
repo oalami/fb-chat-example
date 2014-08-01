@@ -1,4 +1,4 @@
 {
-  "firebase": "rethinkdb",
+  "firebase": "yc-hacks",
   "public": "."
 }
