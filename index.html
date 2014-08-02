@@ -1,12 +1,12 @@
 <html>
 <head>
-    <title>YC Hacks Firebase Chat Example</title>
+    <title>YC Hacks Firebase Example</title>
     <script src="https://cdn.firebase.com/js/client/1.0.18/firebase.js"></script>
-    <script  src='https://cdn.firebase.com/js/simple-login/1.4.1/firebase-simple-login.js'></script>
+    <script src='https://cdn.firebase.com/js/simple-login/1.4.1/firebase-simple-login.js'></script>
     
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'></script>
     
-    <link rel="stylesheet" href="css/main.css"></link>
+    <link rel="stylesheet" href="css/main.css"/>
 </head>
 <body>
 
@@ -22,53 +22,43 @@
 <script>
 
 	//STEP 1: Define Firebase references
-
-
-	//do this by hand
-	var ref = new Firebase("https://yc-hacks.firebaseio.com/");
+	var ref = new Firebase("https://yc-hacks.firebaseio.com");
+	var messagesRef = ref.child("messages") //https://yc-hacks.firebaseio.com/messages
 	var usersRef = ref.child("users");
-	var messagesRef = ref.child("messages");
 	var currentUser = null;
 
 	//STEP 2: Log user in when login button is clicked
-
-	//copy-paste
 	$('#login').on("click", function () {
 		auth.login('twitter');
 	});
 
 	//STEP 3: Login with Twitter
-
-	//do this by hand, first console.log(user), then switch out
-	var auth = new FirebaseSimpleLogin(ref, function (error, user) {
-		if (error) {
+	var auth = new FirebaseSimpleLogin(ref, function(error, user) {
+		if(error) {
 			console.log(error);
 		} else if (user) {
-			usersRef.child(user.uid).set({username: user.username, pic: user.thirdPartyUserData.profile_image_url});
 			currentUser = user;
+			usersRef.child(user.uid).set({username: user.username, pic: user.thirdPartyUserData.profile_image_url});
+			// console.log(user);
 		} else {
-			//user is logged out
+			// logged out
 		}
-	});
 
+	});
 
 	//STEP 4: Display a list of users who have logged in
-	//write the usersRef.on("child_added"), paste in the jquery
-	usersRef.on("child_added", function (snapshot) {
-	var user = snapshot.val();
-	$("<div id='user'><img src=" + user.pic + "/><span id='username'>@" + user.username + "</span></div>").appendTo($('#here'));
-
+	usersRef.on('child_added', function(snapshot) {
+		var user = snapshot.val();
+		$("<div id='user'><img src=" + user.pic + "/><span id='username'>@" + user.username + "</span></div>").appendTo($('#here'));
 	});
-
-
+	
 	//STEP 5: Store messages in Firebase
-	//pase all of this except for messagesRef.push()
 	$('#tweet-submit').on('click', function () {
 		if (currentUser != null) {
 			var message = $('#msgInput').val();
 
 			//Send the message to Firebase
-			messagesRef.push({user: currentUser.uid, username: currentUser.username, message: message});
+			messagesRef.push({user: currentUser.uid, message: message, username: currentUser.username});
 			$('#msgInput').val('');
 		} else {
 			alert('You must login with Twitter to post!');
@@ -77,11 +67,11 @@
 
 
 	//STEP 6: Add messages to DOM in realtime
-	//write the messagesRef.on, copy-paste the jquery
-	messagesRef.on("child_added", function (snapshot) {
-	var message = snapshot.val();
-	$('#stream').append($("<div class='msg-text'>").text(message.username).append('<br/>').append($('<span/>').text(message.message)));
+	messagesRef.on('child_added', function(snapshot){
+		message = snapshot.val();
+		$('#stream').append($("<div class='msg-text'>").text(message.username).append('<br/>').append($('<span/>').text(message.message)));
 	});
+	
 </script>
 </body>
 

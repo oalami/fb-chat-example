@@ -1,6 +1,6 @@
 //STEP 1
 
-var ref = new Firebase("https://rethinkdb.firebaseio.com/");
+var ref = new Firebase("https://yc-hacks.firebaseio.com/");
 var messageRef = ref.child('messages');
 var usersRef = ref.child('users');
 var currentUser = null;
@@ -44,6 +44,7 @@ var auth = new FirebaseSimpleLogin(ref, function (error, user) {
 messageRef.push({message: message, username: currentUser.username, user: currentUser.uid});
 
 //STEP 6
-	var message = snapshot.val();
-	$("<div class='msg-text'>@" + message.username + "<br/>" + message.message + "</div>").appendTo($('#stream'));
+var message = snapshot.val();
+$('#stream').append($("<div class='msg-text'>").text(message.username).append('<br/>').append($('<span/>').text(message.message)));
+	
 
