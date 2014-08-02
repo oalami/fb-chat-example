@@ -23,34 +23,38 @@
 
 	//STEP 1: Define Firebase references
 	var ref = new Firebase("https://yc-hacks.firebaseio.com");
-	var messagesRef = ref.child("messages") //https://yc-hacks.firebaseio.com/messages
-	var usersRef = ref.child("users");
+	var usersRef = ref.child("users"); //https://yc-hacks.firebaseio.com/users
+	var messagesRef = ref.child("messages");
 	var currentUser = null;
+	
 
 	//STEP 2: Log user in when login button is clicked
 	$('#login').on("click", function () {
 		auth.login('twitter');
-	});
+	});	
+	
 
 	//STEP 3: Login with Twitter
 	var auth = new FirebaseSimpleLogin(ref, function(error, user) {
 		if(error) {
 			console.log(error);
-		} else if (user) {
+		} else if(user) {			
+			//console.log(user);
 			currentUser = user;
 			usersRef.child(user.uid).set({username: user.username, pic: user.thirdPartyUserData.profile_image_url});
-			// console.log(user);
 		} else {
-			// logged out
+			// user logged out
 		}
-
 	});
+	
 
 	//STEP 4: Display a list of users who have logged in
-	usersRef.on('child_added', function(snapshot) {
+	usersRef.on('child_added', function(snapshot){
 		var user = snapshot.val();
-		$("<div id='user'><img src=" + user.pic + "/><span id='username'>@" + user.username + "</span></div>").appendTo($('#here'));
+	$("<div id='user'><img src=" + user.pic + "/><span id='username'>@" + user.username + "</span></div>").appendTo($('#here'));
 	});
+
+	
 	
 	//STEP 5: Store messages in Firebase
 	$('#tweet-submit').on('click', function () {
@@ -58,18 +62,19 @@
 			var message = $('#msgInput').val();
 
 			//Send the message to Firebase
-			messagesRef.push({user: currentUser.uid, message: message, username: currentUser.username});
+			messagesRef.push({message: message, username: currentUser.username, user: currentUser.uid });
+
 			$('#msgInput').val('');
 		} else {
 			alert('You must login with Twitter to post!');
 		}
 	});
 
-
 	//STEP 6: Add messages to DOM in realtime
-	messagesRef.on('child_added', function(snapshot){
-		message = snapshot.val();
-		$('#stream').append($("<div class='msg-text'>").text(message.username).append('<br/>').append($('<span/>').text(message.message)));
+	messagesRef.on('child_added', function(snapshot) {
+		var message = snapshot.val();
+	$('#stream').append($("<div class='msg-text'>").text(message.username).append('<br/>').append($('<span/>').text(message.message)));
+	
 	});
 	
 </script>
